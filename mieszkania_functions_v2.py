@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from requests import get
 import pandas as pd
+import datetime
 
 
 def parse_price(price):
@@ -34,7 +35,6 @@ def parse_page(URL):
 def data_from_city(city, base_URL, num_of_pages):
     df = pd.DataFrame(columns=['name', 'link', 'price', 'city', 'region'])
     for num in range(1,num_of_pages+1):
-        print(f"Downloading data from page number {num}, city: {city}")
         URL = f"{base_URL}?page={num}"
         page_table = parse_page(URL)
         df = pd.concat([df, pd.DataFrame(page_table, columns=['name', 'link', 'price', 'city', 'region'])], ignore_index=True)

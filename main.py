@@ -1,3 +1,5 @@
+from pickletools import UP_TO_NEWLINE
+from turtle import up
 from mieszkania_functions_v2 import number_of_pages, data_from_city
 from bs4 import BeautifulSoup
 from requests import get
@@ -20,14 +22,15 @@ def filtration_iqr(df):
     q1 = df.loc[:,'price'].quantile(0.25)
     q3 = df.loc[:,'price'].quantile(0.75)
     iqr = q3 - q1
-    low_boundary = (q1 - 1.5 * iqr)
-    upp_boundary = (q3 + 1.5 * iqr)
+    low_boundary = (q1 - iqr)
+    upp_boundary = (q3 + iqr)
     x_filtr = df[(df.loc[:,'price']>low_boundary) & (df.loc[:,'price']<upp_boundary)].reset_index(drop=True)
     stats = [datetime.datetime.now().strftime("%Y-%m-%d"), x_filtr.shape[0], round(x_filtr.loc[:,'price'].mean(),2), iqr]
     return stats, x_filtr
 
 def main():
     dirname = os.path.dirname(os.path.abspath("__file__"))
+    print(dirname)
     dirname = os.path.join(dirname, "daily_databases")
     list_of_file = os.listdir(dirname)
     for pick in list_of_file:
@@ -44,12 +47,17 @@ def main():
         x = pd.DataFrame(stat).T
         x.columns = ['date','number','mean', 'std']
         all = pd.concat([all, x], ignore_index=True)
+        print(filtrated_data)
         all.to_csv(f"{dirname}/{pick[0]}.csv", index_label='index')
         print(x, pick[0])
     return df
 
-if __name__ == '__main__':
-    df = main()
 
 
+df = main()
 
+#from apscheduler.schedulers.background import BackgroundScheduler, BlockingScheduler
+
+#scheduler = BlockingScheduler()
+#scheduler.add_job(func=main, trigger='interval', seconds=360, id='my custom task')
+#scheduler.start()
