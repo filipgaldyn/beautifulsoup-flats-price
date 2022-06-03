@@ -30,19 +30,18 @@ def filtration_iqr(df):
 
 def main():
     dirname = os.path.dirname(os.path.abspath("__file__"))
-    print(dirname)
     dirname = os.path.join(dirname, "daily_databases")
     list_of_file = os.listdir(dirname)
     for pick in list_of_file:
         all = pd.read_csv(os.path.join(dirname, pick), index_col='index')
         pick = pick.split('.')
         city = pick[0]
-        base_URL = f"https://www.olx.pl/nieruchomosci/mieszkania/wynajem/{city}/"
+        base_URL = f"https://www.olx.pl/d/nieruchomosci/mieszkania/wynajem/{city}"
         page = get(base_URL)
         bs = BeautifulSoup(page.content, "html.parser")
         num_of_pages = number_of_pages(page, bs)
         df = data_from_city(city, base_URL, num_of_pages)
-        #stat, filtrated_data = filtration(df)
+        stat, filtrated_data = filtration(df)
         stat, filtrated_data = filtration_iqr(df)
         x = pd.DataFrame(stat).T
         x.columns = ['date','number','mean', 'std']
